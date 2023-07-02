@@ -7,6 +7,8 @@ library(FSelector)
 library(RWeka)
 library(data.table)
 library(Boruta)
+library(ggcorrplot)
+library(GGally)
 
 # load the dataset
 df <- read.csv("project_data.csv", na.strings = "?")
@@ -31,6 +33,10 @@ for (col in na_cols) {
 sum(is.na(df))
 
 ## data reduction
+
+# remove duplicate attributes
+df <- df[!duplicated(df)]
+dim(df)
 
 # dimensionality reduction
 
@@ -79,6 +85,13 @@ attCopy <- c("vs064a", "vs066", "vs068", "SchCultureRecode", "class")
 df <- subset(df, select = attCopy)
 head(df)
 
+# save the preprocessed data
 #write.csv(df, "preprocessed_data.csv", row.names = FALSE)
+
+# correlation plot
+sub_df <- subset(df, select = c("vs064a", "vs066", "vs068", "SchCultureRecode"))
+cor(sub_df)
+ggpairs(sub_df)
+ggcorrplot(cor(sub_df), method = "square", lab = TRUE)
 
 
