@@ -35,7 +35,7 @@ sum(is.na(df))
 ## data reduction
 
 # remove duplicate attributes
-df <- df[!duplicated(df)]
+df <- df[!duplicated(as.list(df))]
 dim(df)
 
 # dimensionality reduction
