@@ -114,4 +114,12 @@ model_1 <- function(train,test) {
 
 result <- model_1(train, test)
 
+model_2 <- function(train,test) {
+  svmml <- svm(class ~ ., data = train)
+  predictions <- predict(svmml, test)
+  cm <- confusionMatrix(predictions, test$class)
+  return(list(table=cm$table, overall=cm$overall, byClass=cm$byClass))
+}
+
+result <- model_2(train, test)
 
