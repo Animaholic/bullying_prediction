@@ -9,7 +9,11 @@ library(data.table)
 library(Boruta)
 library(ggcorrplot)
 library(GGally)
+library(rsample)
+library(e1071)
 
+###############################################################################
+### data preprocessing
 # load the dataset
 df <- read.csv("project_data.csv", na.strings = "?")
 dim(df)
@@ -17,10 +21,7 @@ dim(df)
 # get the number of missing values
 sum(is.na(df))
 
-### data preprocessing
-
 ## data cleaning
-
 # identify columns with missing values
 na_cols <- colnames(df)[colSums(is.na(df)) > 0]
 
@@ -53,31 +54,31 @@ highCorr
 df <- df[, -findCorrelation(corr, cutoff = 0.7)]
 dim(df)
 
-# cfs
-subset <- cfs(class ~., df)
-df.cfs <- as.simple.formula(subset, "class")
-df.cfs
-att1 <- c("vs007","vs030","vs064a","vs066","vs068","vs131","SchCultureRecode")
-
-# info gain
-df2 <- copy(df)
-df2 <- as.data.frame(unclass(df2), stringsAsFactors = TRUE)
-df2$class <- factor(df2$class)
-df2.infogain <- InfoGainAttributeEval(class ~., data = df2)
-sorted.features <- sort(df2.infogain, decreasing = TRUE)
-sorted.features[1:10]
-att2 <- c("vs129","SchCultureRecode","vs066","vs068","vr16","vs130","vs046","vs061","vs064a","vs060")
-
-# Boruta
-df.boruta <- Boruta(class ~., data = df)
-df.boruta
-att3 <- getSelectedAttributes(df.boruta, withTentative=FALSE)
-att3
-
-# find common elements
-attShared <- intersect(intersect(att1,att2), att3)
-attShared
-attShared <- c(attShared, "class")
+# # cfs
+# subset <- cfs(class ~., df)
+# df.cfs <- as.simple.formula(subset, "class")
+# df.cfs
+# att1 <- c("vs007","vs030","vs064a","vs066","vs068","vs131","SchCultureRecode")
+# 
+# # info gain
+# df2 <- copy(df)
+# df2 <- as.data.frame(unclass(df2), stringsAsFactors = TRUE)
+# df2$class <- factor(df2$class)
+# df2.infogain <- InfoGainAttributeEval(class ~., data = df2)
+# sorted.features <- sort(df2.infogain, decreasing = TRUE)
+# sorted.features[1:10]
+# att2 <- c("vs129","SchCultureRecode","vs066","vs068","vr16","vs130","vs046","vs061","vs064a","vs060")
+# 
+# # Boruta
+# df.boruta <- Boruta(class ~., data = df)
+# df.boruta
+# att3 <- getSelectedAttributes(df.boruta, withTentative=FALSE)
+# att3
+# 
+# # find common elements
+# attShared <- intersect(intersect(att1,att2), att3)
+# attShared
+# attShared <- c(attShared, "class")
 
 # select important attributes
 # create attCopy for temporary use (no need to run feature selection)
@@ -94,16 +95,22 @@ cor(sub_df)
 ggpairs(sub_df)
 ggcorrplot(cor(sub_df), method = "square", lab = TRUE)
 
+
+###############################################################################
+### classification
 df$class <- factor(df$class)
 
+# train-test split
 split <- initial_split(df, prop = 0.7, strata = class)
 train <- training(split)
 test <- testing(split)
-#10-fold cross-validation
+
+# 10-fold cross-validation
 set.seed(31)
 train_control <- trainControl(method = "repeatedcv", number = 10, repeats = 5, 
                               summaryFunction = defaultSummary)
 
+## Model 1: J48
 model_1 <- function(train,test) {
   set.seed(31)
   j48ml <- J48(class~., data=train)
@@ -113,7 +120,9 @@ model_1 <- function(train,test) {
 }
 
 result <- model_1(train, test)
+result
 
+## Model 2: SVM
 model_2 <- function(train,test) {
   svmml <- svm(class ~ ., data = train)
   predictions <- predict(svmml, test)
@@ -122,4 +131,4 @@ model_2 <- function(train,test) {
 }
 
 result <- model_2(train, test)
-
+result
