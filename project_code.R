@@ -94,4 +94,24 @@ cor(sub_df)
 ggpairs(sub_df)
 ggcorrplot(cor(sub_df), method = "square", lab = TRUE)
 
+df$class <- factor(df$class)
+
+split <- initial_split(df, prop = 0.7, strata = class)
+train <- training(split)
+test <- testing(split)
+#10-fold cross-validation
+set.seed(31)
+train_control <- trainControl(method = "repeatedcv", number = 10, repeats = 5, 
+                              summaryFunction = defaultSummary)
+
+model_1 <- function(train,test) {
+  set.seed(31)
+  j48ml <- J48(class~., data=train)
+  predictions <- predict(j48ml, test)
+  cm <- confusionMatrix(predictions, test$class)
+  return(list(table=cm$table, overall=cm$overall, byClass=cm$byClass))
+}
+
+result <- model_1(train, test)
+
 
