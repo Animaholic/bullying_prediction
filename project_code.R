@@ -111,13 +111,10 @@ train_control <- trainControl(method = "repeatedcv", number = 10, repeats = 5,
                               summaryFunction = defaultSummary)
 
 
-## Model 1: J48 
-install.packages("RWeka")
-library(RWeka)
-
+## Model 1: knn
 model_1 <- function(train,test) {
-  j48ml <- J48(class~., data=train)
-  predictions <- predict(j48ml, test)
+  knn_model <- train(class ~ ., data = train, method = "knn", trControl=train_control, preProcess = c("center", "scale"), tuneLength = 100)
+  predictions <- predict(knn_model, test)
   cm <- confusionMatrix(predictions, test$class)
   return(list(table=cm$table, overall=cm$overall, byClass=cm$byClass))
 }
@@ -132,8 +129,8 @@ library(e1071)
 tuneGrid <- expand.grid(sigma = seq(0.1, 0.4, by = 0.05), C = seq(1.0, 2.0, by = 0.1))
 
 model_2 <- function(train,test) {
-  svmml <- train(class ~ ., data = train, method = "svmRadial", trControl = train_control, tuneGrid = tuneGrid)
-  predictions <- predict(svmml, test)
+  svm_model <- train(class ~ ., data = train, method = "svmRadial", trControl = train_control, tuneGrid = tuneGrid)
+  predictions <- predict(svm_model, test)
   cm <- confusionMatrix(predictions, test$class)
   return(list(table=cm$table, overall=cm$overall, byClass=cm$byClass))
 }
