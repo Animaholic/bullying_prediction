@@ -112,6 +112,9 @@ train_control <- trainControl(method = "repeatedcv", number = 10, repeats = 5,
 
 
 ## Model 1: knn
+install.packages("class")
+library(class)
+
 model_1 <- function(train,test) {
   knn_model <- train(class ~ ., data = train, method = "knn", trControl=train_control, preProcess = c("center", "scale"), tuneLength = 100)
   predictions <- predict(knn_model, test)
