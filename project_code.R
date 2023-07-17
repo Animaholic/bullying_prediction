@@ -177,7 +177,7 @@ result4 <- model_4(train, test)
 result4
 
 ## Model 5: Logistic Regression
-tuneGrid <- expand.grid(.penalty = c(0.01, 0.1, 1, 10, 100), .tol = c(1e-8, 1e-6, 1e-4))
+tuneGrid <- expand.grid(alpha = 0:1, lambda = c(0.01, 0.1, 1, 10, 100))
 
 model_5 <- function(train, test) {
   set.seed(31)
