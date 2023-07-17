@@ -56,30 +56,30 @@ df <- df[, -findCorrelation(corr, cutoff = 0.7)]
 dim(df)
 
 # # cfs
-# subset <- cfs(class ~., df)
-# df.cfs <- as.simple.formula(subset, "class")
-# df.cfs
+subset <- cfs(class ~., df)
+df.cfs <- as.simple.formula(subset, "class")
+df.cfs
 att1 <- c("vs007","vs030","vs064a","vs066","vs068","vs131","SchCultureRecode")
 # 
 # # info gain
-# df2 <- copy(df)
-# df2 <- as.data.frame(unclass(df2), stringsAsFactors = TRUE)
-# df2$class <- factor(df2$class)
-# df2.infogain <- InfoGainAttributeEval(class ~., data = df2)
-# sorted.features <- sort(df2.infogain, decreasing = TRUE)
-# sorted.features[1:10]
-# att2 <- c("vs129","SchCultureRecode","vs066","vs068","vr16","vs130","vs046","vs061","vs064a","vs060")
+df2 <- copy(df)
+df2 <- as.data.frame(unclass(df2), stringsAsFactors = TRUE)
+df2$class <- factor(df2$class)
+df2.infogain <- InfoGainAttributeEval(class ~., data = df2)
+sorted.features <- sort(df2.infogain, decreasing = TRUE)
+sorted.features[1:10]
+att2 <- c("vs129","SchCultureRecode","vs066","vs068","vr16","vs130","vs046","vs061","vs064a","vs060")
 # 
 # # Boruta
-# df.boruta <- Boruta(class ~., data = df)
-# df.boruta
-# att3 <- getSelectedAttributes(df.boruta, withTentative=FALSE)
-# att3
+df.boruta <- Boruta(class ~., data = df)
+df.boruta
+att3 <- getSelectedAttributes(df.boruta, withTentative=FALSE)
+att3
 # 
 # # find common elements
-# attShared <- intersect(intersect(att1,att2), att3)
-# attShared
-# attShared <- c(attShared, "class")
+attShared <- intersect(intersect(att1,att2), att3)
+attShared
+attShared <- c(attShared, "class")
 
 # select important attributes
 # create attCopy for temporary use (no need to run feature selection)
