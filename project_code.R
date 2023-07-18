@@ -59,7 +59,7 @@ dim(df)
 # subset <- cfs(class ~., df)
 # df.cfs <- as.simple.formula(subset, "class")
 # df.cfs
-att1 <- c("vs007","vs030","vs064a","vs066","vs068","vs131","SchCultureRecode")
+# att1 <- c("vs007","vs030","vs064a","vs066","vs068","vs131","SchCultureRecode")
 # 
 # # info gain
 # df2 <- copy(df)
@@ -83,10 +83,44 @@ att1 <- c("vs007","vs030","vs064a","vs066","vs068","vs131","SchCultureRecode")
 
 # select important attributes
 # create attCopy for temporary use (no need to run feature selection)
-attCopy <- c(att1, "class")
+attCopy <- c("vs064a", "vs066", "vs068", "SchCultureRecode", "class")
 df <- subset(df, select = attCopy)
 head(df)
 table(df$class)
+
+# correlation plot
+sub_df <- subset(df, select = att1)
+cor(sub_df)
+ggpairs(sub_df)
+ggcorrplot(cor(sub_df), method = "square", lab = TRUE)
+
+# Function to remove outliers based on IQR
+remove_outliers <- function(data, features) {
+  # Create a new data frame
+  new_df <- data
+  
+  # Loop through each feature
+  for (feature in features) {
+    # Calculate the lower and upper bounds
+    q1 <- quantile(data[[feature]], 0.25)
+    q3 <- quantile(data[[feature]], 0.75)
+    iqr <- q3 - q1
+    lower_bound <- q1 - 1.5 * iqr
+    upper_bound <- q3 + 1.5 * iqr
+    # Remove outliers
+    new_df <- new_df[!(data[[feature]] < lower_bound | data[[feature]] > upper_bound), ]
+  }
+  return(new_df)
+}
+
+# Define the features to consider
+features <- c("vs064a", "vs066", "vs068", "SchCultureRecode")
+
+# Remove outliers based on IQR
+df <- remove_outliers(df, features)
+head(df)
+dim(df)
+
 
 # over and undersampling
 library(ROSE)
@@ -96,17 +130,11 @@ head(oversampled_data)
 
 df <- data.frame(oversampled_data)
 head(df)
+dim(df)
 table(df$class)
 
 # save the preprocessed data
 #write.csv(df, "preprocessed_data.csv", row.names = FALSE)
-
-# correlation plot
-sub_df <- subset(df, select = att1)
-cor(sub_df)
-ggpairs(sub_df)
-ggcorrplot(cor(sub_df), method = "square", lab = TRUE)
-
 
 ###############################################################################
 ### classification
