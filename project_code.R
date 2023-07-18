@@ -16,6 +16,8 @@ library(class)
 library(randomForest)
 library(gbm)
 library(glmnet)
+library(naivebayes)
+library(ROCR)
 
 ###############################################################################
 ### data preprocessing
@@ -128,8 +130,22 @@ train_control <- trainControl(method = "repeatedcv", number = 10, repeats = 5,
 model_1 <- function(train,test) {
   knn_model <- train(class ~ ., data = train, method = "knn", trControl=train_control, preProcess = c("center", "scale"), tuneLength = 100)
   predictions <- predict(knn_model, test)
-  cm <- confusionMatrix(predictions, test$class)
-  return(list(table=cm$table, overall=cm$overall, byClass=cm$byClass))
+  pred_perf <- prediction(as.numeric(predictions), labels = as.numeric(test$class))
+  auc=as.numeric(performance(pred_perf, measure = "auc")@y.values)
+  cm1 <- confusionMatrix(predictions, test$class,positive="1")
+  tb1=cm1$table
+  TP1<-cm1$table[1,1]
+  TN1<-cm1$table[2,2]
+  FP1<-cm1$table[1,2]
+  FN1<-cm1$table[2,1]
+  MCC1 <- ((TP1*TN1)-(FP1*FN1))/((TP1+FP1)^0.5*(TP1+FN1)^0.5*(TN1+FP1)^0.5*(TN1+FN1)^0.5)
+  cm2 <- confusionMatrix(predictions, test$class,positive="2")
+  TP2<-cm2$table[1,1]
+  TN2<-cm2$table[2,2]
+  FP2<-cm2$table[1,2]
+  FN2<-cm2$table[2,1]
+  return(list(table=cm1$table, overall=cm1$overall, byClass1=cm1$byClass,
+              byClass2=cm2$byClass,MCC=MCC1,auc=auc))
 }
 
 result1 <- model_1(train, test)
@@ -141,8 +157,22 @@ tuneGrid <- expand.grid(sigma = seq(0.1, 0.4, by = 0.05), C = seq(1.0, 2.0, by =
 model_2 <- function(train,test) {
   svm_model <- train(class ~ ., data = train, method = "svmRadial", trControl = train_control, tuneGrid = tuneGrid)
   predictions <- predict(svm_model, test)
-  cm <- confusionMatrix(predictions, test$class)
-  return(list(table=cm$table, overall=cm$overall, byClass=cm$byClass))
+  pred_perf <- prediction(as.numeric(predictions), labels = as.numeric(test$class))
+  auc=as.numeric(performance(pred_perf, measure = "auc")@y.values)
+  cm1 <- confusionMatrix(predictions, test$class,positive="1")
+  tb1=cm1$table
+  TP1<-cm1$table[1,1]
+  TN1<-cm1$table[2,2]
+  FP1<-cm1$table[1,2]
+  FN1<-cm1$table[2,1]
+  MCC1 <- ((TP1*TN1)-(FP1*FN1))/((TP1+FP1)^0.5*(TP1+FN1)^0.5*(TN1+FP1)^0.5*(TN1+FN1)^0.5)
+  cm2 <- confusionMatrix(predictions, test$class,positive="2")
+  TP2<-cm2$table[1,1]
+  TN2<-cm2$table[2,2]
+  FP2<-cm2$table[1,2]
+  FN2<-cm2$table[2,1]
+  return(list(table=cm1$table, overall=cm1$overall, byClass1=cm1$byClass,
+              byClass2=cm2$byClass,MCC=MCC1,auc=auc))
 }
 
 result2 <- model_2(train, test)
@@ -155,8 +185,22 @@ model_3 <- function(train, test) {
   set.seed(31)
   rf_model <- train(class ~ ., data = train, method = "rf", trControl = train_control, tuneGrid = tuneGrid)
   predictions <- predict(rf_model, test)
-  cm <- confusionMatrix(predictions, test$class)
-  return(list(table=cm$table, overall=cm$overall, byClass=cm$byClass))
+  pred_perf <- prediction(as.numeric(predictions), labels = as.numeric(test$class))
+  auc=as.numeric(performance(pred_perf, measure = "auc")@y.values)
+  cm1 <- confusionMatrix(predictions, test$class,positive="1")
+  tb1=cm1$table
+  TP1<-cm1$table[1,1]
+  TN1<-cm1$table[2,2]
+  FP1<-cm1$table[1,2]
+  FN1<-cm1$table[2,1]
+  MCC1 <- ((TP1*TN1)-(FP1*FN1))/((TP1+FP1)^0.5*(TP1+FN1)^0.5*(TN1+FP1)^0.5*(TN1+FN1)^0.5)
+  cm2 <- confusionMatrix(predictions, test$class,positive="2")
+  TP2<-cm2$table[1,1]
+  TN2<-cm2$table[2,2]
+  FP2<-cm2$table[1,2]
+  FN2<-cm2$table[2,1]
+  return(list(table=cm1$table, overall=cm1$overall, byClass1=cm1$byClass,
+              byClass2=cm2$byClass,MCC=MCC1,auc=auc))
 }
 
 result3 <- model_3(train, test)
@@ -169,8 +213,22 @@ model_4 <- function(train, test) {
   set.seed(31)
   gbm_model <- train(class ~ ., data = train, method = "gbm", trControl = train_control, tuneGrid = tuneGrid, verbose = FALSE)
   predictions <- predict(gbm_model, test)
-  cm <- confusionMatrix(predictions, test$class)
-  return(list(table=cm$table, overall=cm$overall, byClass=cm$byClass))
+  pred_perf <- prediction(as.numeric(predictions), labels = as.numeric(test$class))
+  auc=as.numeric(performance(pred_perf, measure = "auc")@y.values)
+  cm1 <- confusionMatrix(predictions, test$class,positive="1")
+  tb1=cm1$table
+  TP1<-cm1$table[1,1]
+  TN1<-cm1$table[2,2]
+  FP1<-cm1$table[1,2]
+  FN1<-cm1$table[2,1]
+  MCC1 <- ((TP1*TN1)-(FP1*FN1))/((TP1+FP1)^0.5*(TP1+FN1)^0.5*(TN1+FP1)^0.5*(TN1+FN1)^0.5)
+  cm2 <- confusionMatrix(predictions, test$class,positive="2")
+  TP2<-cm2$table[1,1]
+  TN2<-cm2$table[2,2]
+  FP2<-cm2$table[1,2]
+  FN2<-cm2$table[2,1]
+  return(list(table=cm1$table, overall=cm1$overall, byClass1=cm1$byClass,
+              byClass2=cm2$byClass,MCC=MCC1,auc=auc))
 }
 
 result4 <- model_4(train, test)
@@ -183,9 +241,51 @@ model_5 <- function(train, test) {
   set.seed(31)
   log_model <- train(class ~ ., data = train, method = "glmnet", trControl = train_control, tuneGrid = tuneGrid)
   predictions <- predict(log_model, test)
-  cm <- confusionMatrix(predictions, test$class)
-  return(list(table=cm$table, overall=cm$overall, byClass=cm$byClass))
+  pred_perf <- prediction(as.numeric(predictions), labels = as.numeric(test$class))
+  auc=as.numeric(performance(pred_perf, measure = "auc")@y.values)
+  cm1 <- confusionMatrix(predictions, test$class,positive="1")
+  tb1=cm1$table
+  TP1<-cm1$table[1,1]
+  TN1<-cm1$table[2,2]
+  FP1<-cm1$table[1,2]
+  FN1<-cm1$table[2,1]
+  MCC1 <- ((TP1*TN1)-(FP1*FN1))/((TP1+FP1)^0.5*(TP1+FN1)^0.5*(TN1+FP1)^0.5*(TN1+FN1)^0.5)
+  cm2 <- confusionMatrix(predictions, test$class,positive="2")
+  TP2<-cm2$table[1,1]
+  TN2<-cm2$table[2,2]
+  FP2<-cm2$table[1,2]
+  FN2<-cm2$table[2,1]
+  return(list(table=cm1$table, overall=cm1$overall, byClass1=cm1$byClass,
+              byClass2=cm2$byClass,MCC=MCC1,auc=auc))
 }
 
 result5 <- model_5(train, test)
 result5
+
+## Model 6: Naive Bayes
+tuneGrid <- expand.grid(.laplace = seq(0, 1, by = 0.1), .usekernel = c(FALSE, TRUE), .adjust = seq(1, 1.5, by = 0.1))
+
+model_6 <- function(train, test) {
+  set.seed(31)
+  nb_model <- train(class ~ ., data = train, method = "naive_bayes", trControl = train_control, tuneGrid = tuneGrid)
+  predictions <- predict(nb_model, test)
+  pred_perf <- prediction(as.numeric(predictions), labels = as.numeric(test$class))
+  auc=as.numeric(performance(pred_perf, measure = "auc")@y.values)
+  cm1 <- confusionMatrix(predictions, test$class,positive="1")
+  tb1=cm1$table
+  TP1<-cm1$table[1,1]
+  TN1<-cm1$table[2,2]
+  FP1<-cm1$table[1,2]
+  FN1<-cm1$table[2,1]
+  MCC1 <- ((TP1*TN1)-(FP1*FN1))/((TP1+FP1)^0.5*(TP1+FN1)^0.5*(TN1+FP1)^0.5*(TN1+FN1)^0.5)
+  cm2 <- confusionMatrix(predictions, test$class,positive="2")
+  TP2<-cm2$table[1,1]
+  TN2<-cm2$table[2,2]
+  FP2<-cm2$table[1,2]
+  FN2<-cm2$table[2,1]
+  return(list(table=cm1$table, overall=cm1$overall, byClass1=cm1$byClass,
+              byClass2=cm2$byClass,MCC=MCC1,auc=auc))
+}
+
+result6 <- model_6(train, test)
+result6
