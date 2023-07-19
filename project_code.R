@@ -147,53 +147,54 @@ model_1 <- function(train, test) {
   FP2<-cm2$table[1,2]
   FN2<-cm2$table[2,1]
   MCC2 <- ((TP2*TN2)-(FP2*FN2))/((TP2+FP2)^0.5*(TP2+FN2)^0.5*(TN2+FP2)^0.5*(TN2+FN2)^0.5)
-  
+
   # Create a data frame with performance measures of Class 1
-  performance_df1 <- data.frame(Measure = c("TP rate", "FP rate", "Precision", 
+  performance_df1 <- data.frame(Measure = c("TP rate", "FP rate", "Precision",
                                             "Recall", "F1-Score", "MCC"),
-                                Value = c(cm1$byClass["Sensitivity"], 
-                                          cm1$byClass["Specificity"], 
-                                          cm1$byClass["Precision"], 
-                                          cm1$byClass["Recall"], 
-                                          cm1$byClass["F1"], 
+                                Value = c(cm1$byClass["Sensitivity"],
+                                          cm1$byClass["Specificity"],
+                                          cm1$byClass["Precision"],
+                                          cm1$byClass["Recall"],
+                                          cm1$byClass["F1"],
                                           MCC1))
-  
+
   # Create a bar plot
-  performance_df1$Measure <- factor(performance_df1$Measure, 
+  performance_df1$Measure <- factor(performance_df1$Measure,
                                     levels = unique(performance_df1$Measure))
   plot1 <- ggplot(performance_df1, aes(x = Measure, y = Value)) +
     geom_bar(stat = "identity", fill = "steelblue") +
     geom_text(aes(label=sprintf("%.3f", Value)), vjust=1.6, color="white", size=3.5) +
     labs(title = "Performance Measures of Class 1", x="Measure", y="Value")
-  
+
   print(plot1) # Display the plot
-  
+
   # Create a data frame with performance measures of Class 2
-  performance_df2 <- data.frame(Measure = c("TP rate", "FP rate", "Precision", 
+  performance_df2 <- data.frame(Measure = c("TP rate", "FP rate", "Precision",
                                             "Recall", "F1-Score", "MCC"),
-                                Value = c(cm2$byClass["Sensitivity"], 
-                                          cm2$byClass["Specificity"], 
-                                          cm2$byClass["Precision"], 
-                                          cm2$byClass["Recall"], 
-                                          cm2$byClass["F1"], 
+                                Value = c(cm2$byClass["Sensitivity"],
+                                          cm2$byClass["Specificity"],
+                                          cm2$byClass["Precision"],
+                                          cm2$byClass["Recall"],
+                                          cm2$byClass["F1"],
                                           MCC2))
-  
+
   # Create a bar plot
-  performance_df2$Measure <- factor(performance_df2$Measure, 
+  performance_df2$Measure <- factor(performance_df2$Measure,
                                     levels = unique(performance_df2$Measure))
   plot2 <- ggplot(performance_df2, aes(x = Measure, y = Value)) +
     geom_bar(stat = "identity", fill = "steelblue") +
     geom_text(aes(label=sprintf("%.3f", Value)), vjust=1.6, color="white", size=3.5) +
     labs(title = "Performance Measures of Class 2", x="Measure", y="Value")
-  
+
   print(plot2) # Display the plot
-  
+
   # Calculate the ROC curve
   perf <- performance(pred_perf,"tpr","fpr")
   plot(perf,colorize=TRUE)
-  
-  print(list(table=cm1$table, overall=cm1$overall, byClass1=cm1$byClass,
-             byClass2=cm2$byClass,MCC1=MCC1,MCC2=MCC2,auc=auc))
+
+  print(list(table1=cm1$table, overall1=cm1$overall, byClass1=cm1$byClass,
+             table2=cm2$table, overall2=cm2$overall, byClass2=cm2$byClass,
+             MCC1=MCC1,MCC2=MCC2,auc=auc))
 }
 
 result1 <- model_1(train, test)
@@ -220,53 +221,54 @@ model_2 <- function(train,test) {
   FP2<-cm2$table[1,2]
   FN2<-cm2$table[2,1]
   MCC2 <- ((TP2*TN2)-(FP2*FN2))/((TP2+FP2)^0.5*(TP2+FN2)^0.5*(TN2+FP2)^0.5*(TN2+FN2)^0.5)
-  
+
   # Create a data frame with performance measures of Class 1
-  performance_df1 <- data.frame(Measure = c("TP rate", "FP rate", "Precision", 
+  performance_df1 <- data.frame(Measure = c("TP rate", "FP rate", "Precision",
                                             "Recall", "F1-Score", "MCC"),
-                                Value = c(cm1$byClass["Sensitivity"], 
-                                          cm1$byClass["Specificity"], 
-                                          cm1$byClass["Precision"], 
-                                          cm1$byClass["Recall"], 
-                                          cm1$byClass["F1"], 
+                                Value = c(cm1$byClass["Sensitivity"],
+                                          cm1$byClass["Specificity"],
+                                          cm1$byClass["Precision"],
+                                          cm1$byClass["Recall"],
+                                          cm1$byClass["F1"],
                                           MCC1))
-  
+
   # Create a bar plot
-  performance_df1$Measure <- factor(performance_df1$Measure, 
+  performance_df1$Measure <- factor(performance_df1$Measure,
                                     levels = unique(performance_df1$Measure))
   plot1 <- ggplot(performance_df1, aes(x = Measure, y = Value)) +
     geom_bar(stat = "identity", fill = "steelblue") +
     geom_text(aes(label=sprintf("%.3f", Value)), vjust=1.6, color="white", size=3.5) +
     labs(title = "Performance Measures of Class 1", x="Measure", y="Value")
-  
+
   print(plot1) # Display the plot
-  
+
   # Create a data frame with performance measures of Class 2
-  performance_df2 <- data.frame(Measure = c("TP rate", "FP rate", "Precision", 
+  performance_df2 <- data.frame(Measure = c("TP rate", "FP rate", "Precision",
                                             "Recall", "F1-Score", "MCC"),
-                                Value = c(cm2$byClass["Sensitivity"], 
-                                          cm2$byClass["Specificity"], 
-                                          cm2$byClass["Precision"], 
-                                          cm2$byClass["Recall"], 
-                                          cm2$byClass["F1"], 
+                                Value = c(cm2$byClass["Sensitivity"],
+                                          cm2$byClass["Specificity"],
+                                          cm2$byClass["Precision"],
+                                          cm2$byClass["Recall"],
+                                          cm2$byClass["F1"],
                                           MCC2))
-  
+
   # Create a bar plot
-  performance_df2$Measure <- factor(performance_df2$Measure, 
+  performance_df2$Measure <- factor(performance_df2$Measure,
                                     levels = unique(performance_df2$Measure))
   plot2 <- ggplot(performance_df2, aes(x = Measure, y = Value)) +
     geom_bar(stat = "identity", fill = "steelblue") +
     geom_text(aes(label=sprintf("%.3f", Value)), vjust=1.6, color="white", size=3.5) +
     labs(title = "Performance Measures of Class 2", x="Measure", y="Value")
-  
+
   print(plot2) # Display the plot
-  
+
   # Calculate the ROC curve
   perf <- performance(pred_perf,"tpr","fpr")
   plot(perf,colorize=TRUE)
-  
-  print(list(table=cm1$table, overall=cm1$overall, byClass1=cm1$byClass,
-             byClass2=cm2$byClass,MCC1=MCC1,MCC2=MCC2,auc=auc))
+
+  print(list(table1=cm1$table, overall1=cm1$overall, byClass1=cm1$byClass,
+             table2=cm2$table, overall2=cm2$overall, byClass2=cm2$byClass,
+             MCC1=MCC1,MCC2=MCC2,auc=auc))
 }
 
 result2 <- model_2(train, test)
@@ -294,53 +296,54 @@ model_3 <- function(train, test) {
   FP2<-cm2$table[1,2]
   FN2<-cm2$table[2,1]
   MCC2 <- ((TP2*TN2)-(FP2*FN2))/((TP2+FP2)^0.5*(TP2+FN2)^0.5*(TN2+FP2)^0.5*(TN2+FN2)^0.5)
-  
+
   # Create a data frame with performance measures of Class 1
-  performance_df1 <- data.frame(Measure = c("TP rate", "FP rate", "Precision", 
+  performance_df1 <- data.frame(Measure = c("TP rate", "FP rate", "Precision",
                                             "Recall", "F1-Score", "MCC"),
-                                Value = c(cm1$byClass["Sensitivity"], 
-                                          cm1$byClass["Specificity"], 
-                                          cm1$byClass["Precision"], 
-                                          cm1$byClass["Recall"], 
-                                          cm1$byClass["F1"], 
+                                Value = c(cm1$byClass["Sensitivity"],
+                                          cm1$byClass["Specificity"],
+                                          cm1$byClass["Precision"],
+                                          cm1$byClass["Recall"],
+                                          cm1$byClass["F1"],
                                           MCC1))
-  
+
   # Create a bar plot
-  performance_df1$Measure <- factor(performance_df1$Measure, 
+  performance_df1$Measure <- factor(performance_df1$Measure,
                                     levels = unique(performance_df1$Measure))
   plot1 <- ggplot(performance_df1, aes(x = Measure, y = Value)) +
     geom_bar(stat = "identity", fill = "steelblue") +
     geom_text(aes(label=sprintf("%.3f", Value)), vjust=1.6, color="white", size=3.5) +
     labs(title = "Performance Measures of Class 1", x="Measure", y="Value")
-  
+
   print(plot1) # Display the plot
-  
+
   # Create a data frame with performance measures of Class 2
-  performance_df2 <- data.frame(Measure = c("TP rate", "FP rate", "Precision", 
+  performance_df2 <- data.frame(Measure = c("TP rate", "FP rate", "Precision",
                                             "Recall", "F1-Score", "MCC"),
-                                Value = c(cm2$byClass["Sensitivity"], 
-                                          cm2$byClass["Specificity"], 
-                                          cm2$byClass["Precision"], 
-                                          cm2$byClass["Recall"], 
-                                          cm2$byClass["F1"], 
+                                Value = c(cm2$byClass["Sensitivity"],
+                                          cm2$byClass["Specificity"],
+                                          cm2$byClass["Precision"],
+                                          cm2$byClass["Recall"],
+                                          cm2$byClass["F1"],
                                           MCC2))
-  
+
   # Create a bar plot
-  performance_df2$Measure <- factor(performance_df2$Measure, 
+  performance_df2$Measure <- factor(performance_df2$Measure,
                                     levels = unique(performance_df2$Measure))
   plot2 <- ggplot(performance_df2, aes(x = Measure, y = Value)) +
     geom_bar(stat = "identity", fill = "steelblue") +
     geom_text(aes(label=sprintf("%.3f", Value)), vjust=1.6, color="white", size=3.5) +
     labs(title = "Performance Measures of Class 2", x="Measure", y="Value")
-  
+
   print(plot2) # Display the plot
-  
+
   # Calculate the ROC curve
   perf <- performance(pred_perf,"tpr","fpr")
   plot(perf,colorize=TRUE)
-  
-  print(list(table=cm1$table, overall=cm1$overall, byClass1=cm1$byClass,
-             byClass2=cm2$byClass,MCC1=MCC1,MCC2=MCC2,auc=auc))
+
+  print(list(table1=cm1$table, overall1=cm1$overall, byClass1=cm1$byClass,
+             table2=cm2$table, overall2=cm2$overall, byClass2=cm2$byClass,
+             MCC1=MCC1,MCC2=MCC2,auc=auc))
 }
 
 result3 <- model_3(train, test)
@@ -368,53 +371,54 @@ model_4 <- function(train, test) {
   FP2<-cm2$table[1,2]
   FN2<-cm2$table[2,1]
   MCC2 <- ((TP2*TN2)-(FP2*FN2))/((TP2+FP2)^0.5*(TP2+FN2)^0.5*(TN2+FP2)^0.5*(TN2+FN2)^0.5)
-  
+
   # Create a data frame with performance measures of Class 1
-  performance_df1 <- data.frame(Measure = c("TP rate", "FP rate", "Precision", 
+  performance_df1 <- data.frame(Measure = c("TP rate", "FP rate", "Precision",
                                             "Recall", "F1-Score", "MCC"),
-                                Value = c(cm1$byClass["Sensitivity"], 
-                                          cm1$byClass["Specificity"], 
-                                          cm1$byClass["Precision"], 
-                                          cm1$byClass["Recall"], 
-                                          cm1$byClass["F1"], 
+                                Value = c(cm1$byClass["Sensitivity"],
+                                          cm1$byClass["Specificity"],
+                                          cm1$byClass["Precision"],
+                                          cm1$byClass["Recall"],
+                                          cm1$byClass["F1"],
                                           MCC1))
-  
+
   # Create a bar plot
-  performance_df1$Measure <- factor(performance_df1$Measure, 
+  performance_df1$Measure <- factor(performance_df1$Measure,
                                     levels = unique(performance_df1$Measure))
   plot1 <- ggplot(performance_df1, aes(x = Measure, y = Value)) +
     geom_bar(stat = "identity", fill = "steelblue") +
     geom_text(aes(label=sprintf("%.3f", Value)), vjust=1.6, color="white", size=3.5) +
     labs(title = "Performance Measures of Class 1", x="Measure", y="Value")
-  
+
   print(plot1) # Display the plot
-  
+
   # Create a data frame with performance measures of Class 2
-  performance_df2 <- data.frame(Measure = c("TP rate", "FP rate", "Precision", 
+  performance_df2 <- data.frame(Measure = c("TP rate", "FP rate", "Precision",
                                             "Recall", "F1-Score", "MCC"),
-                                Value = c(cm2$byClass["Sensitivity"], 
-                                          cm2$byClass["Specificity"], 
-                                          cm2$byClass["Precision"], 
-                                          cm2$byClass["Recall"], 
-                                          cm2$byClass["F1"], 
+                                Value = c(cm2$byClass["Sensitivity"],
+                                          cm2$byClass["Specificity"],
+                                          cm2$byClass["Precision"],
+                                          cm2$byClass["Recall"],
+                                          cm2$byClass["F1"],
                                           MCC2))
-  
+
   # Create a bar plot
-  performance_df2$Measure <- factor(performance_df2$Measure, 
+  performance_df2$Measure <- factor(performance_df2$Measure,
                                     levels = unique(performance_df2$Measure))
   plot2 <- ggplot(performance_df2, aes(x = Measure, y = Value)) +
     geom_bar(stat = "identity", fill = "steelblue") +
     geom_text(aes(label=sprintf("%.3f", Value)), vjust=1.6, color="white", size=3.5) +
     labs(title = "Performance Measures of Class 2", x="Measure", y="Value")
-  
+
   print(plot2) # Display the plot
-  
+
   # Calculate the ROC curve
   perf <- performance(pred_perf,"tpr","fpr")
   plot(perf,colorize=TRUE)
-  
-  print(list(table=cm1$table, overall=cm1$overall, byClass1=cm1$byClass,
-             byClass2=cm2$byClass,MCC1=MCC1,MCC2=MCC2,auc=auc))
+
+  print(list(table1=cm1$table, overall1=cm1$overall, byClass1=cm1$byClass,
+             table2=cm2$table, overall2=cm2$overall, byClass2=cm2$byClass,
+             MCC1=MCC1,MCC2=MCC2,auc=auc))
 }
 
 result4 <- model_4(train, test)
@@ -442,53 +446,54 @@ model_5 <- function(train, test) {
   FP2<-cm2$table[1,2]
   FN2<-cm2$table[2,1]
   MCC2 <- ((TP2*TN2)-(FP2*FN2))/((TP2+FP2)^0.5*(TP2+FN2)^0.5*(TN2+FP2)^0.5*(TN2+FN2)^0.5)
-  
+
   # Create a data frame with performance measures of Class 1
-  performance_df1 <- data.frame(Measure = c("TP rate", "FP rate", "Precision", 
+  performance_df1 <- data.frame(Measure = c("TP rate", "FP rate", "Precision",
                                             "Recall", "F1-Score", "MCC"),
-                                Value = c(cm1$byClass["Sensitivity"], 
-                                          cm1$byClass["Specificity"], 
-                                          cm1$byClass["Precision"], 
-                                          cm1$byClass["Recall"], 
-                                          cm1$byClass["F1"], 
+                                Value = c(cm1$byClass["Sensitivity"],
+                                          cm1$byClass["Specificity"],
+                                          cm1$byClass["Precision"],
+                                          cm1$byClass["Recall"],
+                                          cm1$byClass["F1"],
                                           MCC1))
-  
+
   # Create a bar plot
-  performance_df1$Measure <- factor(performance_df1$Measure, 
+  performance_df1$Measure <- factor(performance_df1$Measure,
                                     levels = unique(performance_df1$Measure))
   plot1 <- ggplot(performance_df1, aes(x = Measure, y = Value)) +
     geom_bar(stat = "identity", fill = "steelblue") +
     geom_text(aes(label=sprintf("%.3f", Value)), vjust=1.6, color="white", size=3.5) +
     labs(title = "Performance Measures of Class 1", x="Measure", y="Value")
-  
+
   print(plot1) # Display the plot
-  
+
   # Create a data frame with performance measures of Class 2
-  performance_df2 <- data.frame(Measure = c("TP rate", "FP rate", "Precision", 
+  performance_df2 <- data.frame(Measure = c("TP rate", "FP rate", "Precision",
                                             "Recall", "F1-Score", "MCC"),
-                                Value = c(cm2$byClass["Sensitivity"], 
-                                          cm2$byClass["Specificity"], 
-                                          cm2$byClass["Precision"], 
-                                          cm2$byClass["Recall"], 
-                                          cm2$byClass["F1"], 
+                                Value = c(cm2$byClass["Sensitivity"],
+                                          cm2$byClass["Specificity"],
+                                          cm2$byClass["Precision"],
+                                          cm2$byClass["Recall"],
+                                          cm2$byClass["F1"],
                                           MCC2))
-  
+
   # Create a bar plot
-  performance_df2$Measure <- factor(performance_df2$Measure, 
+  performance_df2$Measure <- factor(performance_df2$Measure,
                                     levels = unique(performance_df2$Measure))
   plot2 <- ggplot(performance_df2, aes(x = Measure, y = Value)) +
     geom_bar(stat = "identity", fill = "steelblue") +
     geom_text(aes(label=sprintf("%.3f", Value)), vjust=1.6, color="white", size=3.5) +
     labs(title = "Performance Measures of Class 2", x="Measure", y="Value")
-  
+
   print(plot2) # Display the plot
-  
+
   # Calculate the ROC curve
   perf <- performance(pred_perf,"tpr","fpr")
   plot(perf,colorize=TRUE)
-  
-  print(list(table=cm1$table, overall=cm1$overall, byClass1=cm1$byClass,
-             byClass2=cm2$byClass,MCC1=MCC1,MCC2=MCC2,auc=auc))
+
+  print(list(table1=cm1$table, overall1=cm1$overall, byClass1=cm1$byClass,
+             table2=cm2$table, overall2=cm2$overall, byClass2=cm2$byClass,
+             MCC1=MCC1,MCC2=MCC2,auc=auc))
 }
 
 result5 <- model_5(train, test)
@@ -561,8 +566,9 @@ model_6 <- function(train, test) {
   perf <- performance(pred_perf,"tpr","fpr")
   plot(perf,colorize=TRUE)
   
-  print(list(table=cm1$table, overall=cm1$overall, byClass1=cm1$byClass,
-             byClass2=cm2$byClass,MCC1=MCC1,MCC2=MCC2,auc=auc))
+  print(list(table1=cm1$table, overall1=cm1$overall, byClass1=cm1$byClass,
+             table2=cm2$table, overall2=cm2$overall, byClass2=cm2$byClass,
+             MCC1=MCC1,MCC2=MCC2,auc=auc))
 }
 
 result6 <- model_6(train, test)
