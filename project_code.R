@@ -11,6 +11,7 @@ library(Boruta)
 library(ggcorrplot)
 library(GGally)
 library(rsample)
+library(ROSE)
 library(e1071)
 library(class)
 library(randomForest)
@@ -99,7 +100,6 @@ cor(sub_df)
 ggpairs(sub_df, title = "Correlation Plot v1")
 
 # over and undersampling
-library(ROSE)
 oversampled_data <- ovun.sample(class ~ ., data = df, method = "both")
 oversampled_data <- oversampled_data$data
 head(oversampled_data)
