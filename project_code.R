@@ -112,14 +112,13 @@ att2 <- c("SchCultureRecode","vs129","vs066","vs045","vs068","vs130","vs049",
 # attShared <- intersect(intersect(att1,att2), att3)
 attShared <- c("v3020","v3081","vs129","vs130","vs045","vs046","vs049","vs051",
                "vs064a","vs066","vs067","vs068","SchCultureRecode")
-length(attShared)
 
 # correlation plot
 sub_df <- subset(df, select = attShared)
 cor(sub_df)
 ggpairs(sub_df, title = "Correlation Plot")
 
-attShared <- c(attShared, "class")
+attShared <- c(attShared, "class") # add class attribute
 
 # select important attributes
 train <- subset(train, select = attShared)
