@@ -1,6 +1,7 @@
 ### Authors: Hongmin Huang, Guohao Shen ###
 
 rm(list=ls()); cat("\014") # Clear workspace and console
+start_time <- Sys.time() # start time
 # libraries
 library(modeest)
 library(caret)
@@ -60,67 +61,73 @@ highCorr
 df <- df[, -findCorrelation(corr, cutoff = 0.7)]
 dim(df)
 
-# cfs
-subset <- cfs(class ~., df)
-df.cfs <- as.simple.formula(subset, "class")
-df.cfs
-att1 <- c("vs007","vs030","vs064a","vs066","vs068","vs131","SchCultureRecode")
-
-
-# # info gain
-# df2 <- copy(df)
-# df2 <- as.data.frame(unclass(df2), stringsAsFactors = TRUE)
-# df2$class <- factor(df2$class)
-# df2.infogain <- InfoGainAttributeEval(class ~., data = df2)
-# sorted.features <- sort(df2.infogain, decreasing = TRUE)
-# sorted.features[1:10]
-# att2 <- c("vs129","SchCultureRecode","vs066","vs068","vr16","vs130","vs046","vs061","vs064a","vs060")
-# 
-# # Boruta
-# df.boruta <- Boruta(class ~., data = df)
-# df.boruta
-# att3 <- getSelectedAttributes(df.boruta, withTentative=FALSE)
-# att3
-# 
-# # find common elements
-# attShared <- intersect(intersect(att1,att2), att3)
-# attShared
-# attShared <- c(attShared, "class")
-
-# select important attributes
-# create attCopy for temporary use (no need to run feature selection)
-attCopy <- c("vs064a", "vs066", "vs068", "SchCultureRecode", "class")
-df <- subset(df, select = attCopy)
-head(df)
-table(df$class)
-
-# correlation plot
-sub_df <- subset(df, select = c("vs064a", "vs066", "vs068", "SchCultureRecode"))
-cor(sub_df)
-ggpairs(sub_df, title = "Correlation Plot v1")
-
-# over and undersampling
-oversampled_data <- ovun.sample(class ~ ., data = df, method = "both")
-oversampled_data <- oversampled_data$data
-head(oversampled_data)
-
-df <- data.frame(oversampled_data) # convert list to data frame
-head(df)
-dim(df)
-table(df$class)
-
 # save the preprocessed data
 #write.csv(df, "preprocessed_data.csv", row.names = FALSE)
 
 ###############################################################################
 ### classification
-df$class <- factor(df$class)
-df[1:4] <- scale(df[1:4]) # standardize all 4 features
+df$class <- factor(df$class) # apply the factor function.
 
 # train-test split
+set.seed(31)
 split <- initial_split(df, prop = 0.66, strata = class)
 train <- training(split)
 test <- testing(split)
+
+# over and under sampling train set
+oversampled_data <- ovun.sample(class ~ ., data = train, method = "both")
+oversampled_data <- oversampled_data$data
+train <- as.data.frame(oversampled_data) # convert list to data frame
+table(train$class)
+dim(train)
+
+# cfs
+subset <- cfs(class ~., train)
+train.cfs <- as.simple.formula(subset, "class")
+train.cfs
+
+att1 <- c("v3020", "v3081", "vs030", "vs129", "vs130", "vs045", "vs046", 
+          "vs049", "vs051", "vs064a", "vs066", "vs067", "vs068", "SchCultureRecode")
+
+# info gain
+train2 <- train
+train2 <- as.data.frame(unclass(train2), stringsAsFactors = TRUE) # convert to data frame
+train2$class <- factor(train2$class) # apply the factor function
+train2.infogain <- InfoGainAttributeEval(class ~., data = train2) # evaluation
+sorted.features <- sort(train2.infogain, decreasing = TRUE) # sort the features
+sorted.features[1:20] # pick the first 20 features
+
+att2 <- c("SchCultureRecode","vs129","vs066","vs045","vs068","vs130","vs049",
+          "vs046","vs064a","v3081","vr16","vs051","vs061","vs067","v3020",
+          "vs060","vs057","vs007","vs047","vs126")
+
+# # Boruta
+# set.seed(31)
+# df.boruta <- Boruta(class ~., data = df)
+# df.boruta
+# att3 <- getSelectedAttributes(df.boruta, withTentative=FALSE)
+# att3
+
+# find common elements
+# attShared <- intersect(intersect(att1,att2), att3)
+attShared <- c("v3020","v3081","vs129","vs130","vs045","vs046","vs049","vs051",
+               "vs064a","vs066","vs067","vs068","SchCultureRecode")
+length(attShared)
+
+# correlation plot
+sub_df <- subset(df, select = attShared)
+cor(sub_df)
+ggpairs(sub_df, title = "Correlation Plot")
+
+attShared <- c(attShared, "class")
+
+# select important attributes
+train <- subset(train, select = attShared)
+test <- subset(test, select = attShared)
+
+# scale
+train[1:13] <- scale(train[1:13])
+test[1:13] <- scale(test[1:13])
 
 # 10-fold cross-validation
 set.seed(31)
@@ -130,7 +137,7 @@ train_control <- trainControl(method = "repeatedcv", number = 10, repeats = 5,
 
 # Model 1: knn
 model_1 <- function(train, test) {
-  knn_model <- train(class ~ ., data = train, method = "knn", trControl=train_control, preProcess = c("center", "scale"), tuneLength = 100)
+  knn_model <<- train(class ~ ., data = train, method = "knn", trControl=train_control, preProcess = c("center", "scale"), tuneLength = 100)
   predictions <- predict(knn_model, test)
   pred_perf <- prediction(as.numeric(predictions), labels = as.numeric(test$class))
   auc=as.numeric(performance(pred_perf, measure = "auc")@y.values)
@@ -204,7 +211,7 @@ result1 <- model_1(train, test)
 tuneGrid <- expand.grid(sigma = seq(0.1, 0.4, by = 0.05), C = seq(1.0, 2.0, by = 0.1))
 
 model_2 <- function(train,test) {
-  svm_model <- train(class ~ ., data = train, method = "svmRadial", trControl = train_control, tuneGrid = tuneGrid)
+  svm_model <<- train(class ~ ., data = train, method = "svmRadial", trControl = train_control, tuneGrid = tuneGrid)
   predictions <- predict(svm_model, test)
   pred_perf <- prediction(as.numeric(predictions), labels = as.numeric(test$class))
   auc=as.numeric(performance(pred_perf, measure = "auc")@y.values)
@@ -279,7 +286,7 @@ tuneGrid <- expand.grid(.mtry = c(1:10))
 
 model_3 <- function(train, test) {
   set.seed(31)
-  rf_model <- train(class ~ ., data = train, method = "rf", trControl = train_control, tuneGrid = tuneGrid)
+  rf_model <<- train(class ~ ., data = train, method = "rf", trControl = train_control, tuneGrid = tuneGrid)
   predictions <- predict(rf_model, test)
   pred_perf <- prediction(as.numeric(predictions), labels = as.numeric(test$class))
   auc=as.numeric(performance(pred_perf, measure = "auc")@y.values)
@@ -354,7 +361,7 @@ tuneGrid <- expand.grid(.interaction.depth = c(1, 5, 10), .n.trees = seq(100, 50
 
 model_4 <- function(train, test) {
   set.seed(31)
-  gbm_model <- train(class ~ ., data = train, method = "gbm", trControl = train_control, tuneGrid = tuneGrid, verbose = FALSE)
+  gbm_model <<- train(class ~ ., data = train, method = "gbm", trControl = train_control, tuneGrid = tuneGrid, verbose = FALSE)
   predictions <- predict(gbm_model, test)
   pred_perf <- prediction(as.numeric(predictions), labels = as.numeric(test$class))
   auc=as.numeric(performance(pred_perf, measure = "auc")@y.values)
@@ -429,7 +436,7 @@ tuneGrid <- expand.grid(alpha = 0:1, lambda = c(0.01, 0.1, 1, 10, 100))
 
 model_5 <- function(train, test) {
   set.seed(31)
-  log_model <- train(class ~ ., data = train, method = "glmnet", trControl = train_control, tuneGrid = tuneGrid)
+  log_model <<- train(class ~ ., data = train, method = "glmnet", trControl = train_control, tuneGrid = tuneGrid)
   predictions <- predict(log_model, test)
   pred_perf <- prediction(as.numeric(predictions), labels = as.numeric(test$class))
   auc=as.numeric(performance(pred_perf, measure = "auc")@y.values)
@@ -504,7 +511,7 @@ tuneGrid <- expand.grid(.laplace = seq(0, 1, by = 0.1), .usekernel = c(FALSE, TR
 
 model_6 <- function(train, test) {
   set.seed(31)
-  nb_model <- train(class ~ ., data = train, method = "naive_bayes", trControl = train_control, tuneGrid = tuneGrid)
+  nb_model <<- train(class ~ ., data = train, method = "naive_bayes", trControl = train_control, tuneGrid = tuneGrid)
   predictions <- predict(nb_model, test)
   pred_perf <- prediction(as.numeric(predictions), labels = as.numeric(test$class))
   auc=as.numeric(performance(pred_perf, measure = "auc")@y.values)
@@ -573,6 +580,8 @@ model_6 <- function(train, test) {
 
 result6 <- model_6(train, test)
 
+end_time <- Sys.time() # end time
+end_time - start_time # time difference
 
 # Collect resamples: This function checks that the models are comparable 
 # and that they used the same training scheme (trainControl configuration). 
